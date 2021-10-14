@@ -1,0 +1,31 @@
+### This is the script for the game's HUD, which calculates the total score and number of lives left ###
+### One heart is hidden from the HUD every time the Player loses a life. If the no. of lives = 0, it displays the Game Over Screen ###
+### Note that if ScoreValue.text is a child of CanvasLayer, replace the $HBoxContainer/ScoreValue.text with $ScoreValue.text in the first line ### 
+
+extends CanvasLayer
+
+func _ready():
+	$HBoxContainer/ScoreValue.text = String(Playervars.score) ## OR $ScoreValue.text = String(Playervars.score)
+	if(Playervars.lives == 2):
+		$TextureRect3.hide()
+	elif(Playervars.lives == 1):
+		$TextureRect3.hide()
+		$TextureRect2.hide()
+	elif(Playervars.lives == 0):
+		get_tree().change_scene("res://GameOver.tscn")
+
+func _on_KinematicBody2D_gold_coin_collected():
+	Playervars.score = Playervars.score + 1
+	_ready () 
+
+func _on_KinematicBody2D_red_coin_collected():
+	Playervars.score = Playervars.score + 5
+	_ready () 
+
+func _on_KinematicBody2D_silver_coin_collected():
+	Playervars.score = Playervars.score + 10
+	_ready () 
+
+func _on_KinematicBody2D_livescount():
+	Playervars.lives = Playervars.lives - 1
+	_ready()

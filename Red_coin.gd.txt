@@ -1,0 +1,12 @@
+extends Area2D
+
+func _ready():
+	$AnimationPlayer.play("Rotate_Coin")	#Play Rotate_Coin animation on a loop
+
+func _on_Red_coin_body_entered(body):
+	$CoinCollectSound.play()	#Play sound effect
+	$AnimationPlayer2.play("coin_bounce") #Play coin_bounce animation
+	body.score_count_red()	#Call the score_count_red() function in Player.gd
+
+func _on_AnimationPlayer2_animation_finished(coin_bounce):
+	queue_free()	#Delete the coin when coin_bounce animation finishes

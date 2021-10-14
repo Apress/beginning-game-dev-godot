@@ -1,0 +1,63 @@
+extends KinematicBody2D
+
+var velocity = Vector2(0,0)
+var gravity = 2000
+
+signal gold_coin_collected #custom signals that are emitted when the corresponding coin is collected
+signal red_coin_collected 
+signal silver_coin_collected 
+
+signal livescount 
+const FIREBALL = preload("res://Fireball.tscn")
+
+func _physics_process(_delta):
+	if Input.is_action_just_pressed("jump") and is_on_floor(): #Jump when on the floor
+		velocity.y= -1000
+		$AnimatedSprite.play("jump")
+		$AudioStreamPlayer.play()
+	if Input.is_action_pressed("left_arrow"): #Move left
+		velocity.x = -300
+		$AnimatedSprite.play("run")
+		$AnimatedSprite.flip_h = true
+	elif Input.is_action_pressed("right_arrow"): #Move right
+		velocity.x = 300
+		$AnimatedSprite.play("run")
+		$AnimatedSprite.flip_h = false
+	else:
+		$AnimatedSprite.play("idle") #Idle
+	if not is_on_floor():
+		$AnimatedSprite.play("jump")
+
+	if Input.is_action_just_pressed("shoot"): #Shoot Fireball
+		var fireball = FIREBALL.instance() 
+		get_parent().add_child(fireball)
+		fireball.position = $Position2D.global_position
+
+	velocity.y  = velocity.y + gravity*(_delta)
+	move_and_slide(velocity, Vector2.UP)
+	velocity.x = lerp(velocity.x,0,0.1)
+
+func hit_enemy():
+	emit_signal("livescount") #Custom signal linked to the _on_KinematicBody2D_livescount() in CanvasLayer.gd
+	set_modulate(Color(1,0.3,0.3,0.6)) #Change the colour of the Player to red when hit
+	$Timer.start()
+
+func _on_Fall_Area_body_entered(body):
+	Playervars.lives = Playervars.lives - 1
+	get_tree().change_scene("res://GameLevel.tscn")
+
+func _on_Finish_Level_Area_body_entered(body):
+	get_tree().change_scene("res://GameOver.tscn")
+
+func _on_Timer_timeout():
+	set_modulate(Color(1,1,1,1)) #Change the Player's colour back to normal after timer completes
+	
+
+func score_count_gold():				
+	emit_signal("gold_coin_collected") #Custom signal linked to _on_KinematicBody2D_gold_coin_collected() in CanvasLayer.gd
+
+func score_count_red():
+	emit_signal("red_coin_collected") #Custom signal linked to _on_KinematicBody2D_red_coin_collected() in CanvasLayer.gd		
+	
+func score_count_silver():
+	emit_signal("silver_coin_collected") #Custom signal linked to _on_KinematicBody2D_silver_coin_collected() in CanvasLayer.gd

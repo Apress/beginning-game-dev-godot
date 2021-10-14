@@ -1,0 +1,7 @@
+extends Area2D
+
+func _physics_process(_delta):
+	position.x = position.x + 1000 * (_delta) #Fireball across the screen
+
+func _on_Fireball_area_entered(area):	#Delete Fireball object once it hits
+	queue_free()

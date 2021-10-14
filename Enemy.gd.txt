@@ -1,0 +1,28 @@
+extends KinematicBody2D
+
+var velocity = Vector2(0,0)
+var speed = 100	
+var direction = -1  #Initial direction (left)
+
+
+func _physics_process(_delta):
+	
+	velocity.x = speed * direction
+	if direction == -1:		
+		$AnimatedSprite.flip_h = false	
+	else:
+		$AnimatedSprite.flip_h = true	#Turn Enemy around to face the other way on coming to the edge of a platform
+	
+
+	$AnimatedSprite.play("run") #Play Enemy run animation
+	move_and_slide(velocity)
+	
+	if $RayCast2D.is_colliding() == false:	#As soon as ledge is encountered, flip the RayCast2D to always be at the front of the Enemy
+		direction = direction * -1
+		$RayCast2D.position.x *= -1
+
+func _on_CollisionChecker_body_entered(body):	#Player hit
+	body.hit_enemy()
+
+func _on_FireballCollisionChecker_area_entered(area):	#Delete the Enemy when the Fireball hits
+	queue_free()
